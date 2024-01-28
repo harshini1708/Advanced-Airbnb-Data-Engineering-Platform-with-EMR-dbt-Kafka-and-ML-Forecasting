@@ -1,0 +1,11 @@
+name: 'airbnb_dbt'
+version: '1.0'
+config-version: 2
+
+profile: 'airbnb_profile'
+
+model-paths: ['models']
+target-path: 'target'
+clean-targets:
+  - 'target'
+  - 'dbt_modules'
