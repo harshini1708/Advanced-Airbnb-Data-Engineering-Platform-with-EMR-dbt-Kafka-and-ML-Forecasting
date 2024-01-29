@@ -1,0 +1,1 @@
+SELECT * FROM {{ ref('staging_listings') }}
