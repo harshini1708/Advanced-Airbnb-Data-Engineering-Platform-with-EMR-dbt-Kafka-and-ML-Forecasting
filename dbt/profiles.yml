@@ -1,0 +1,13 @@
+
+airbnb_profile:
+  target: dev
+  outputs:
+    dev:
+      type: redshift
+      host: <your-redshift-host>
+      user: <your-username>
+      password: <your-password>
+      port: 5439
+      dbname: airbnb
+      schema: public
+      threads: 1
