@@ -39,53 +39,78 @@ The data engineering pipeline is divided into three DAG segments. Each stage is 
 
 ```mermaid
 flowchart LR
-    A[begin_execution] --> B[preprocess_data_submit]
-    B --> C[preprocess_data_wait]
-    C --> D[preprocess_data_check]
-    classDef phase fill:#def,stroke:#222,stroke-width:1px
-    class A,B,C,D phase
+    style begin_execution fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style preprocess_data_submit fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style preprocess_data_wait fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style preprocess_data_check fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+
+    begin_execution --> preprocess_data_submit
+    preprocess_data_submit --> preprocess_data_wait
+    preprocess_data_wait --> preprocess_data_check
 ```
+
 
 ### Phase II – Spark Transformations and Enrichment
 
 ```mermaid
-flowchart LR
-    A[preprocess_data_check] --> B[process_listings_hosts_submit]
-    B --> C[process_listings_hosts_wait]
-    C --> D[listings_hosts_check]
+flowchart TB
+    style preprocess_data_check fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style process_listings_hosts_submit fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style process_listings_hosts_wait fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style listings_hosts_check fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style process_weather_submit fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style process_weather_wait fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style weather_check fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style process_reviews_submit fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style process_reviews_wait fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style reviews_check fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style process_reviewers_submit fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style process_reviewers_wait fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style reviewers_check fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style update_dim_model fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
 
-    A --> E[process_weather_submit]
-    E --> F[process_weather_wait]
-    F --> G[weather_check]
+    preprocess_data_check --> process_listings_hosts_submit
+    process_listings_hosts_submit --> process_listings_hosts_wait
+    process_listings_hosts_wait --> listings_hosts_check
 
-    G --> H[process_reviews_submit]
-    H --> I[process_reviews_wait]
-    I --> J[reviews_check]
-    J --> K[process_reviewers_submit]
-    K --> L[process_reviewers_wait]
-    L --> M[reviewers_check]
-    M --> N[update_dim_model]
+    preprocess_data_check --> process_weather_submit
+    process_weather_submit --> process_weather_wait
+    process_weather_wait --> weather_check
 
-    classDef block fill:#e0f7fa,stroke:#222,stroke-width:1px
-    class A,B,C,D,E,F,G,H,I,J,K,L,M,N block
+    weather_check --> process_reviews_submit
+    process_reviews_submit --> process_reviews_wait
+    process_reviews_wait --> reviews_check
+    reviews_check --> process_reviewers_submit
+    process_reviewers_submit --> process_reviewers_wait
+    process_reviewers_wait --> reviewers_check
+    reviewers_check --> update_dim_model
 ```
-
 ### Phase III – Redshift Loading and Completion
 
 ```mermaid
 flowchart LR
-    A[update_dim_model] --> B[drop_tables]
-    B --> C[create_tables]
-    C --> D[copy_listings_to_redshift]
-    C --> E[copy_reviews_to_redshift]
-    C --> F[copy_hosts_to_redshift]
-    C --> G[copy_reviewers_to_redshift]
-    C --> H[copy_weather_to_redshift]
-    H --> I[redshift_check]
-    I --> J[Stop_execution]
+    style update_dim_model fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style drop_tables fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style create_tables fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style copy_listings_to_redshift fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style copy_reviews_to_redshift fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style copy_hosts_to_redshift fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style copy_reviewers_to_redshift fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style copy_weather_to_redshift fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style redshift_check fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
+    style Stop_execution fill:#fff,stroke:#333,stroke-width:2px,color:#000,font-size:16px
 
-    classDef green fill:#dcedc8,stroke:#222,stroke-width:1px
-    class A,B,C,D,E,F,G,H,I,J green
+    update_dim_model --> drop_tables
+    drop_tables --> create_tables
+
+    create_tables --> copy_listings_to_redshift
+    create_tables --> copy_reviews_to_redshift
+    create_tables --> copy_hosts_to_redshift
+    create_tables --> copy_reviewers_to_redshift
+    create_tables --> copy_weather_to_redshift
+
+    copy_weather_to_redshift --> redshift_check
+    redshift_check --> Stop_execution
 ```
 
 ---
